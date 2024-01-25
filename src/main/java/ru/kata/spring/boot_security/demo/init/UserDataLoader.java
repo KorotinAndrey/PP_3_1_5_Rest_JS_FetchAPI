@@ -35,17 +35,17 @@ public class UserDataLoader implements ApplicationRunner {
         final Role adminRole = new Role(2L, "ROLE_ADMIN");
         roleRepository.save(adminRole);
 
-        final User admin = new User("AdminName", "AdminSurname", 30, "admin@admin.com");
+        final User admin = new User("Andrey", "Korotin", 32, "korotin@mail.ru");
         admin.setId(1L);
-        admin.setUsername("admin");
-        admin.setPassword(passwordEncoder.encode("admin"));
+        admin.setUsername("korotin@mail.ru");
+        admin.setPassword(passwordEncoder.encode("12345"));
         admin.setRoles(new HashSet<>(List.of(userRole, adminRole)));
         userRepository.save(admin);
 
-        final User user = new User("UserName", "UserSurname", 20, "user@user.com");
+        final User user = new User("Anna", "Korotina", 31, "anna@mail.ru");
         user.setId(2L);
-        user.setUsername("user");
-        user.setPassword(passwordEncoder.encode("user"));
+        user.setUsername("anna@mail.ru");
+        user.setPassword(passwordEncoder.encode("12345"));
         user.setRoles(new HashSet<>(List.of(userRole)));
         userRepository.save(user);
     }
