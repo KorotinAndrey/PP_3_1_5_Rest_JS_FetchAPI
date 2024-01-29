@@ -10,8 +10,7 @@ import jakarta.persistence.Table;
 import org.springframework.security.core.GrantedAuthority;
 
 
-
-
+import java.util.Objects;
 import java.util.Set;
 
 
@@ -69,5 +68,17 @@ public class Role implements GrantedAuthority {
 
     public void setUsers(Set<User> users) {
         this.users = users;
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Role role = (Role) obj;
+        return Objects.equals(name, role.name);
     }
 }
