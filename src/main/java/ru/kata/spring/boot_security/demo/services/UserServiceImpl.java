@@ -1,65 +1,70 @@
 package ru.kata.spring.boot_security.demo.services;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ru.kata.spring.boot_security.demo.model.Role;
+import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.model.User;
-import ru.kata.spring.boot_security.demo.repository.RoleRepository;
 import ru.kata.spring.boot_security.demo.repository.UserRepository;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
+@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
 
-    private final PasswordEncoder passwordEncoder;
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
+    private UserRepository userRepository;
+    private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    public UserServiceImpl(PasswordEncoder passwordEncoder, UserRepository userRepository, RoleRepository roleRepository) {
-        this.passwordEncoder = passwordEncoder;
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    @Override
+    @Transactional
+    public void addUser(User user) {
+        String encodedPassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(encodedPassword);
+        userRepository.save(user);
 
     }
 
     @Override
-    public List<User> getAllUsers() {
+    @Transactional
+    public void updateUser(User user) {
+        String encodedPassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(encodedPassword);
+        userRepository.save(user);
+
+    }
+
+    @Override
+    @Transactional
+    public void deleteUser(Long id) {
+        if (userRepository.findById(id).isPresent()) {
+            userRepository.deleteById(id);
+        }
+
+    }
+
+    @Override
+    @Transactional
+    public List<User> allUsers() {
         return userRepository.findAll();
     }
 
     @Override
-    public User addUser(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+    @Transactional
+    public User getUserByUsername(String username) {
+        return userRepository.findByUsername(username);
+
     }
 
     @Override
-    public User saveUser(User user, Long id) {
-        User currentUser = userRepository.findById(id).get();
-        if (!user.getPassword().equals(currentUser.getPassword())) {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-        }
-        return userRepository.save(user);
-    }
-
-    @Override
-    public User getUser(Long id) {
-        return userRepository.findById(id).get();
-    }
-
-    @Override
-    public void deleteUser(Long id) {
-        userRepository.deleteById(id);
-    }
-
-    @Override
-    public List<Role> getAllRoles() {
-        return roleRepository.findAll();
+    @Transactional
+    public User findUserById(long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("User не найден с id: " + id));
     }
 }
