@@ -1,6 +1,6 @@
 // Admin panel
 
-const url = "http://localhost:8080/api/admin";
+const url = "/api/admin";
 
 
 // Вкладка User table admin panel с информацией о пользователях и кнопками редактирования и удаления
